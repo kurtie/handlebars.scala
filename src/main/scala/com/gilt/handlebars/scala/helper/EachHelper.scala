@@ -14,7 +14,7 @@ class EachHelper[T] extends Helper[T] {
 	      "first" -> contextFactory.bindPrimitive(idx==0),
               "key" -> contextFactory.bindPrimitive(key),
               "index" -> contextFactory.bindPrimitive(idx),
-	      "last" -> contextFactory.bindPrimitive( idx != col.size )
+	      "last" -> contextFactory.bindPrimitive( idx == col.size-1 )
            ))
       }.mkString
     } else if (arg0.isCollection) {
