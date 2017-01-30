@@ -41,7 +41,12 @@ object DynamicBindingCache {
 }
 
 
-class DynamicBinding(val data: Any) extends FullBinding[Any] with Loggable {
+class DynamicBinding(val d: Any) extends FullBinding[Any] with Loggable {  
+  val data= d match {
+      case Some(s) => s
+      case _ => d
+  }
+
   override protected def factory = DynamicBinding
   def render = if (isTruthy) data.toString else ""
 
@@ -58,10 +63,10 @@ class DynamicBinding(val data: Any) extends FullBinding[Any] with Loggable {
 
   @scala.annotation.tailrec
   final def traverse(key: String, args: Seq[Binding[Any]] = Nil): Binding[Any] = data match {
-    case Some(m) => new DynamicBinding(m).traverse(key, args)
+    case Some(m) => new DynamicBinding(m).traverse(key, args) 
     case _: Map[_, _] => data.asInstanceOf[Map[String, _]]
       .get(key)
-      .map(new DynamicBinding(_))
+      .map(v => new DynamicBinding(v) )
       .getOrElse(VoidBinding)
     case _ => DynamicBindingCache
       .getMethods(data.getClass)
@@ -87,9 +92,9 @@ class DynamicBinding(val data: Any) extends FullBinding[Any] with Loggable {
 }
 
 object DynamicBinding extends BindingFactory[Any] {
-  def apply(model: Any): Binding[Any] =
+  def apply(model: Any): Binding[Any] = {
     new DynamicBinding(model)
-
+  }
   def bindPrimitive(model: String) = apply(model)
   def bindPrimitive(model: Boolean) = apply(model)
   def bindPrimitive(model: Int) = apply(model)
